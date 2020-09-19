@@ -22,18 +22,20 @@ public class XMLParser {
 
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
         
-        String url = "http://www-db.deis.unibo.it/courses/TW/DOCS/w3schools/xml/cd_catalog.xml";
-        downloadUsingNIO(url, "/Users/Agata/Documents/NetBeansProjects/XMLParser/myFile.xml");
+        for(String a : args) {
         
+        String url = a;
+     
+        downloadUsingNIO(url, "myFile.xml");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse("/Users/Agata/Documents/NetBeansProjects/XMLParser/myFile.xml");
+        Document document = builder.parse("myFile.xml");
         document.getDocumentElement().normalize();
         String rootName = document.getDocumentElement().getNodeName();
         ArrayList nameList = getNameList(document, rootName);
         writeCSV(document, nameList);
         
-        
+        }
     }
     
 
@@ -49,15 +51,15 @@ public class XMLParser {
     
     
     private static ArrayList getNameList(Document document, String rootName) {
-        NodeList nl = document.getElementsByTagName("*");
+        NodeList nodeList = document.getElementsByTagName("*");
         Node node;
         ArrayList<String> list = new ArrayList<String>();
 
-        for (int i=0; i<nl.getLength(); i++) {
-            node = nl.item(i);
-            String a  = node.getNodeName();
-            if (!list.contains(a) && a != rootName) {
-                list.add(a);
+        for (int i=0; i<nodeList.getLength(); i++) {
+            node = nodeList.item(i);
+            String name  = node.getNodeName();
+            if (!list.contains(name) && name != rootName) {
+                list.add(name);
             }  
         }
         return list;    
@@ -66,8 +68,7 @@ public class XMLParser {
     
     private static void writeCSV(Document document, ArrayList nameList) throws IOException {  
         NodeList list = document.getElementsByTagName((String) nameList.get(0));
-        int len = list.getLength();
-        File file = new File("/Users/Agata/Documents/NetBeansProjects/XMLParser/myFile.csv");
+        File file = new File("myFile.csv");
         FileWriter csvFile = new FileWriter(file);
         
         for (int k = 1; k < nameList.size(); k++) {
