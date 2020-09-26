@@ -2,4 +2,6 @@
 /build/
 /nbproject/
 /.idea/
+/out
 myFile.*
+XMLParser.iml
