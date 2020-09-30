@@ -11,27 +11,21 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class XMLParser {
 
     final private String URL;
-    final private String XMLFileName;
-    final private String CSVFileName;
-    final private String ExcelFileName;
+    final private String type;
+    final private String name;
 
-    public XMLParser(String URL, String XMLFileName, String CSVFileName, String ExcelFileName) {
+
+    public XMLParser(String URL, String type, String name) {
         this.URL = URL;
-        this.XMLFileName = XMLFileName;
-        this.CSVFileName = CSVFileName;
-        this.ExcelFileName = ExcelFileName;
+        this.type = type;
+        this.name = name;
 
     }
 
@@ -40,14 +34,16 @@ public class XMLParser {
         Document document = createDocumentBuilderFactory();
         String rootName = document.getDocumentElement().getNodeName();
         ArrayList nameList = getNameList(document, rootName);
-        writeCSV(document, nameList);
-        writeExcelFile(document, nameList);
+        FilesFactory factory = new FilesFactory();
+        NewFile file = factory.createFile(type);
+        file.writeFile(document, nameList, name);
     }
 
     private void downloadUsingNIO() throws IOException {
         URL url = new URL(URL);
         ReadableByteChannel byteChannel = Channels.newChannel(url.openStream());
-        FileOutputStream output = new FileOutputStream(XMLFileName);
+        String xmlName = name + ".xml";
+        FileOutputStream output = new FileOutputStream(xmlName);
         output.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
         output.close();
         byteChannel.close();
@@ -56,7 +52,8 @@ public class XMLParser {
     private Document createDocumentBuilderFactory() throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(XMLFileName);
+        String xmlName = name + ".xml";
+        Document document = builder.parse(xmlName);
         document.getDocumentElement().normalize();
         return document;
     }
@@ -69,80 +66,14 @@ public class XMLParser {
         for (int i = 0; i < nodeList.getLength(); i++) {
             node = nodeList.item(i);
             String name = node.getNodeName();
-            if (!list.contains(name) && name != rootName) {
+            if (!list.contains(name) && !name.equals(rootName)) {
                 list.add(name);
             }
         }
         return list;
     }
 
-    private void writeCSV(Document document, ArrayList nameList) throws IOException {
-        NodeList list = document.getElementsByTagName((String) nameList.get(0));
-        File file = new File(CSVFileName);
-        FileWriter csvFile = new FileWriter(file);
 
-        for (int k = 1; k < nameList.size(); k++) {
-            String nodeName1 = (String) nameList.get(k);
-            csvFile.append(nodeName1);
-            if (k != nameList.size() - 1) {
-                csvFile.append(", ");
-            }
-        }
-
-        csvFile.append("\n");
-
-        for (int j = 0; j < list.getLength(); j++) {
-            Node node = list.item(j);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) node;
-
-                for (int i = 1; i < nameList.size(); i++) {
-                    String nodeName = (String) nameList.get(i);
-                    String value = eElement.getElementsByTagName(nodeName).item(0).getTextContent();
-                    csvFile.append(value);
-                    if (i != nameList.size() - 1) {
-                        csvFile.append(", ");
-                    }
-                }
-            }
-            csvFile.append("\n");
-        }
-        csvFile.flush();
-        csvFile.close();
-    }
-
-    private void writeExcelFile(Document document, ArrayList nameList) throws FileNotFoundException, IOException {
-
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("Java Books");
-        NodeList list = document.getElementsByTagName((String) nameList.get(0));
-
-        int rowCounter = 0;
-        Row row = sheet.createRow(rowCounter);
-        for (int k = 1; k < nameList.size(); k++) {
-            String nodeName1 = (String) nameList.get(k);
-
-            Cell cell = row.createCell(k - 1);
-            cell.setCellValue((String) nodeName1);
-        }
-
-        for (int j = 0; j < list.getLength(); j++) {
-            Node node = list.item(j);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) node;
-                Row newRow = sheet.createRow(++rowCounter);
-
-                for (int i = 1; i < nameList.size(); i++) {
-                    String nodeName = (String) nameList.get(i);
-                    String value = eElement.getElementsByTagName(nodeName).item(0).getTextContent();
-                    Cell cell = newRow.createCell(i - 1);
-                    cell.setCellValue((String) value);
-                }
-            }
-        }
-        FileOutputStream outputStream = new FileOutputStream(ExcelFileName);
-        workbook.write(outputStream);
-    }
 }
 
 
