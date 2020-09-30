@@ -6,3 +6,7 @@
 myFile.*
 XMLParser.iml
 /target/
+*.xml
+*.xlsx
+*.csv
+
