@@ -20,26 +20,27 @@ public class XMLParser {
     final private String URL;
     final private String type;
     final private String name;
-
+    final private FilesFactory factory;
+    final private DocumentBuilderFactory documentBuilderFactory;
 
     public XMLParser(String URL, String type, String name) {
         this.URL = URL;
         this.type = type;
         this.name = name;
-
+        this.factory = new FilesFactory();
+        this.documentBuilderFactory = DocumentBuilderFactory.newInstance();
     }
 
     public void run() throws IOException, ParserConfigurationException, SAXException {
-        downloadUsingNIO();
+        downloadXML();
         Document document = createDocumentBuilderFactory();
         String rootName = document.getDocumentElement().getNodeName();
         ArrayList nameList = getNameList(document, rootName);
-        FilesFactory factory = new FilesFactory();
         NewFile file = factory.createFile(type);
         file.writeFile(document, nameList, name);
     }
 
-    private void downloadUsingNIO() throws IOException {
+    private void downloadXML() throws IOException {
         URL url = new URL(URL);
         ReadableByteChannel byteChannel = Channels.newChannel(url.openStream());
         String xmlName = name + ".xml";
@@ -50,8 +51,7 @@ public class XMLParser {
     }
 
     private Document createDocumentBuilderFactory() throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
+        DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
         String xmlName = name + ".xml";
         Document document = builder.parse(xmlName);
         document.getDocumentElement().normalize();

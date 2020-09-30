@@ -15,19 +15,18 @@ public class CSVFile implements NewFile {
 
     public void writeFile(Document document, ArrayList nameList, String name) throws IOException {
         NodeList list = document.getElementsByTagName((String) nameList.get(0));
-        File file = new File(name+".csv");
+        File file = new File(name + ".csv");
         FileWriter csvFile = new FileWriter(file);
 
-        for (int k = 1; k < nameList.size(); k++) {
-            String nodeName1 = (String) nameList.get(k);
+        for (int i = 1; i < nameList.size(); i++) {
+            String nodeName1 = (String) nameList.get(i);
             csvFile.append(nodeName1);
-            if (k != nameList.size() - 1) {
+            if (i != nameList.size() - 1) {
                 csvFile.append(", ");
             }
         }
 
         csvFile.append("\n");
-
         for (int j = 0; j < list.getLength(); j++) {
             Node node = list.item(j);
             if (node.getNodeType() == Node.ELEMENT_NODE) {

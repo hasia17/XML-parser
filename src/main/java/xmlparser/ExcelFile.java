@@ -17,20 +17,17 @@ import java.util.ArrayList;
 public class ExcelFile implements NewFile {
 
     public void writeFile(Document document, ArrayList nameList, String name) throws FileNotFoundException, IOException {
-
         XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(name+".xlsx");
+        XSSFSheet sheet = workbook.createSheet(name + ".xlsx");
         NodeList list = document.getElementsByTagName((String) nameList.get(0));
-
         int rowCounter = 0;
         Row row = sheet.createRow(rowCounter);
-        for (int k = 1; k < nameList.size(); k++) {
-            String nodeName1 = (String) nameList.get(k);
 
-            Cell cell = row.createCell(k - 1);
+        for (int i = 1; i < nameList.size(); i++) {
+            String nodeName1 = (String) nameList.get(i);
+            Cell cell = row.createCell(i - 1);
             cell.setCellValue((String) nodeName1);
         }
-
         for (int j = 0; j < list.getLength(); j++) {
             Node node = list.item(j);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -45,7 +42,7 @@ public class ExcelFile implements NewFile {
                 }
             }
         }
-        FileOutputStream outputStream = new FileOutputStream(name+".xlsx");
+        FileOutputStream outputStream = new FileOutputStream(name + ".xlsx");
         workbook.write(outputStream);
     }
 }

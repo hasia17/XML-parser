@@ -9,8 +9,6 @@ import org.xml.sax.SAXException;
 public class Runner {
 
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
-
-
         XMLParser parser = new XMLParser(
                 "https://www.w3schools.com/xml/cd_catalog.xml",
                 "xlsx",
@@ -21,7 +19,6 @@ public class Runner {
 //            args[1],
 //            args[2]
 //         );
-
         parser.run();
     }
 }

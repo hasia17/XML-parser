@@ -9,5 +9,4 @@ public interface NewFile {
 
     void writeFile(Document document, ArrayList nameList, String name) throws IOException;
 
-
 }
